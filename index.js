@@ -7,7 +7,7 @@ import bookRoutes from './routes/book.js';
 // ... (your existing imports)
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Setup __dirname
 const __filename = fileURLToPath(import.meta.url);
