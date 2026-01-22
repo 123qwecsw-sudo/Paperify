@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  />
+  <title>Official Board Paper | Paperify</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Inter:wght@400;600;700;800&family=Crimson+Pro:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --paper-width: 210mm;
+      --brand-green: #19c880;
+      --deep-navy: #3f3a64;
+    }
+
+    body {
+      background-color: #525659;
+      margin: 0;
+      padding: 16px 0;
+      -webkit-print-color-adjust: exact;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Paper container: responsive */
+    .paper-sheet {
+      background: white;
+      width: 100%;
+      max-width: var(--paper-width);
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: clamp(10mm, 4vw, 15mm) clamp(8mm, 4vw, 20mm);
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      position: relative;
+      color: #000;
+      font-family: 'Crimson Pro', serif;
+      user-select: none;         /* Prevent text selection (copy) */
+      -webkit-user-select: none; /* Safari */
+      -ms-user-select: none;     /* IE/Edge */
+    }
+
+    .urdu-text {
+      font-family: 'Noto Nastaliq Urdu', serif;
+      direction: rtl;
+      line-height: 2.2;
+      font-size: 1.1rem;
+      word-spacing: 2px;
+    }
+
+    .board-header {
+      border: 2px solid #000;
+      padding: 10px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .board-name {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .student-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border: 1px solid #000;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: 'Inter', sans-serif;
+    }
+    @media (max-width: 640px) {
+      .student-info { grid-template-columns: 1fr; }
+    }
+
+    .field-line {
+      border-bottom: 1px dotted #000;
+      display: inline-block;
+      width: 65%;
+      height: 15px;
+    }
+
+    /* Table Styling Rule */
+    .exam-table {
+      width: 100%;
+      margin: 12px auto;
+      border-collapse: collapse;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .exam-table th, .exam-table td {
+      border: 1px solid #000;
+      padding: 6px 8px;
+    }
+    .exam-table th {
+      background-color: #f8f8f8;
+      font-weight: bold;
+    }
+
+    .section-heading {
+      background-color: #f0f0f0;
+      border: 1px solid #000;
+      text-align: center;
+      font-weight: bold;
+      padding: 6px;
+      margin: 16px 0 12px 0;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .question-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+    @media (max-width: 640px) {
+      .question-row { flex-direction: column; }
+    }
+
+    .q-number { font-weight: bold; min-width: 40px; }
+    .q-text-en { flex: 1; padding-right: 10px; font-size: 1.02rem; }
+    .q-marks { font-weight: bold; padding: 0 8px; font-size: 0.9rem; white-space: nowrap; }
+    .q-text-ur { flex: 1; text-align: right; padding-left: 10px; }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 640px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Sticky topbar */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(32,33,36,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: white;
+    }
+    .topbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .topbar-title {
+      font-weight: 900; letter-spacing: -0.02em; display:flex; align-items:center; gap:10px; white-space: nowrap;
+    }
+    .chip { font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); }
+    .toolbar { display:flex; gap:10px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn { border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.10); color: white; padding: 8px 12px; border-radius: 12px; font-weight: 800; transition: transform 0.15s ease, background 0.15s ease; display:inline-flex; align-items:center; gap:8px; }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.16); }
+    .btn.primary { background: var(--brand-green); border-color: rgba(25,200,128,0.6); box-shadow: 0 8px 24px rgba(25,200,128,0.25); color: #0b2a1d; }
+    .btn.danger { background: rgba(239,68,68,0.20); border-color: rgba(239,68,68,0.35); }
+
+    @media print {
+      body { background: none; padding: 0; }
+      .paper-sheet { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 10mm 12mm; }
+      .no-print { display: none !important; }
+    }
+
+    /* Prevent selection/copy globally on paper area only; toolbar remains usable */
+    .no-select {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar no-print">
+    <div class="topbar-inner">
+      <div class="topbar-title">
+        <span>Paperify</span>
+        <span class="chip" id="topbarMeta">Preparing…</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="sharePaper()"><span>Share</span></button>
+        <button class="btn" onclick="window.print()">Print</button>
+        <button class="btn danger" onclick="window.history.back()">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="paper-sheet no-select" id="paperRoot">
+    <div class="board-header">
+      <div class="board-name" id="boardHeading">BOARD EXAMINATION 2026</div>
+      <div class="text-lg font-bold mt-1" id="subjectHeading">SUBJECT GROUP</div>
+    </div>
+
+    <div class="flex justify-between font-bold text-sm mb-4 px-1" style="gap:8px;flex-wrap:wrap">
+      <span id="displayTime">TIME ALLOWED: 3:00 HOURS</span>
+      <span id="displayMarks">MAXIMUM MARKS: 0</span>
+    </div>
+
+    <div class="student-info">
+      <div>NAME: <span class="field-line"></span></div>
+      <div>ROLL NO: <span class="field-line"></span></div>
+      <div>SECTION: <span class="field-line"></span></div>
+      <div>CENTER: <span class="field-line"></span></div>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="mt-12 pt-4 border-t border-black text-center text-xs font-bold italic">
+      *** END OF EXAMINATION PAPER - PAPERIFY OFFICIAL SYSTEM ***
+    </div>
+  </div>
+
+<script>
+    // Query params
+    const urlParams = new URLSearchParams(window.location.search);
+    const board = urlParams.get('board') || 'Board';
+    const className = urlParams.get('class') || '10';
+    const group = urlParams.get('group') || 'Science';
+    const selections = JSON.parse(urlParams.get('selections') || '[]');
+    const config = JSON.parse(urlParams.get('config') || '{"duration":"3 Hours","mcqs":{"include":true,"count":10,"marks":1,"mode":"random","picked":[]},"short":{"include":true,"count":5,"marks":2,"mode":"random","picked":[]},"long":{"include":true,"count":3,"marks":5,"mode":"random","picked":[]}}');
+
+    // Headings
+    document.getElementById('topbarMeta').innerText = `${board.toUpperCase()} • Class ${className}`;
+    document.getElementById('boardHeading').innerText = `${board.toUpperCase()} BOARD EXAMINATION 2026`;
+    document.getElementById('subjectHeading').innerText = `${group.toUpperCase()} GROUP - GRADE ${className}`;
+    document.getElementById('displayTime').innerText = `TIME ALLOWED: ${String(config.duration || '').toUpperCase()}`;
+
+    // Helper: fix image path
+    const fixPath = (p) => {
+      if (!p) return null;
+      if (typeof p === 'string' && p.includes('images')) {
+        const parts = p.split('images');
+        return '/images' + parts[parts.length - 1].replace(/\\/g, '/');
+      }
+      return p;
+    };
+
+    // Helper: table HTML
+    function generateTableHTML(tableData) {
+      if (!tableData || !Array.isArray(tableData) || tableData.length === 0) return '';
+      const headers = Object.keys(tableData[0]);
+      let html = `<table class="exam-table"><thead><tr>`;
+      headers.forEach(h => html += `<th>${String(h).replace(/_/g, ' ').toUpperCase()}</th>`);
+      html += `</tr></thead><tbody>`;
+      tableData.forEach(row => {
+        html += `<tr>`;
+        headers.forEach(h => { html += `<td>${row[h]}</td>`; });
+        html += `</tr>`;
+      });
+      html += `</tbody></table>`;
+      return html;
+    }
+
+    // Key format used by settings: "type|subject|chapter|index"
+    const makeKey = (type, subject, chapter, index) => `${type}|${subject}|${chapter}|${index}`;
+
+    // Builders for normalized items
+    function makeItemFromShort(ch, q, i, subject, chapter, urArr) {
+      const en = typeof q === 'string' ? q : (q.question || q.en || '');
+      const ur = Array.isArray(urArr) ? (urArr[i] || '') : (q.question_ur || q.ur || '');
+      return {
+        key: makeKey('short', subject, chapter, i),
+        en, ur,
+        img: fixPath(q.image_url),
+        table: q.table || null
+      };
+    }
+    function makeItemFromLong(ch, q, i, subject, chapter, urArr) {
+      const en = typeof q === 'string' ? q : (q.question || q.en || '');
+      const ur = Array.isArray(urArr) ? (urArr[i] || '') : (q.question_ur || q.ur || '');
+      return {
+        key: makeKey('long', subject, chapter, i),
+        en, ur,
+        img: fixPath(q.image_url),
+        table: q.table || null
+      };
+    }
+    function makeItemFromTheorem(ch, t, i, subject, chapter, urArr) {
+      const en = typeof t === 'string' ? t : (t.statement || t.en || t.title || t.question || `Theorem #${i+1}`);
+      const ur = Array.isArray(urArr) ? (urArr[i] || '') : (t.statement_ur || t.ur || t.title_ur || t.question_ur || '');
+      return {
+        key: makeKey('theorem', subject, chapter, i),
+        en, ur,
+        img: fixPath(t.image_url),
+        table: t.table || null
+      };
+    }
+
+    async function generatePaper() {
+      const container = document.getElementById('questionsContainer');
+      try {
+        const response = await fetch(`/api/data/${board}`);
+        const syllabus = await response.json();
+        const classData = syllabus.find(c => String(c.class) === String(className));
+        if (!classData) return;
+
+        let totalExamMarks = 0;
+        container.innerHTML = '';
+
+        // Pools
+        const pools = { mcqs: [], short: [], long: [], theorem: [] };
+
+        selections.forEach(sel => {
+          const subject = classData.subjects.find(s => s.name?.en?.toLowerCase() === sel.subject.toLowerCase());
+          if (!subject) return;
+
+          sel.chapters.forEach(chapTitle => {
+            const ch = subject.chapters.find(c =>
+              (c.title?.en === chapTitle || c.chapter?.en === chapTitle || c.chapter === chapTitle)
+            );
+            if (!ch) return;
+
+            const chapterEN = ch.chapter?.en || ch.title?.en || chapTitle;
+
+            // MCQs
+            if (Array.isArray(ch.mcqs)) {
+              ch.mcqs.forEach((q, i) => {
+                pools.mcqs.push({
+                  key: makeKey('mcq', sel.subject, chapterEN, i),
+                  full: q
+                });
+              });
+            }
+            // Short
+            if (Array.isArray(ch.short_questions)) {
+              const urArr = Array.isArray(ch.short_questions_ur) ? ch.short_questions_ur : [];
+              ch.short_questions.forEach((q, i) => {
+                pools.short.push({
+                  key: makeKey('short', sel.subject, chapterEN, i),
+                  full: makeItemFromShort(ch, typeof q === 'string' ? { question: q } : q, i, sel.subject, chapterEN, urArr)
+                });
+              });
+            }
+            // Long
+            if (Array.isArray(ch.long_questions)) {
+              const urArr = Array.isArray(ch.long_questions_ur) ? ch.long_questions_ur : [];
+              ch.long_questions.forEach((q, i) => {
+                pools.long.push({
+                  key: makeKey('long', sel.subject, chapterEN, i),
+                  full: makeItemFromLong(ch, typeof q === 'string' ? { question: q } : q, i, sel.subject, chapterEN, urArr)
+                });
+              });
+            }
+            // Theorems: arrays theorem + theorem_ur
+            if (Array.isArray(ch.theorem) && ch.theorem.length) {
+              const urArr = Array.isArray(ch.theorem_ur) ? ch.theorem_ur : [];
+              ch.theorem.forEach((t, i) => {
+                pools.theorem.push({
+                  key: makeKey('theorem', sel.subject, chapterEN, i),
+                  full: makeItemFromTheorem(ch, t, i, sel.subject, chapterEN, urArr)
+                });
+              });
+            }
+          });
+        });
+
+        // Selection helper
+        function pickItems(poolArr, conf) {
+          if (!conf || !conf.include) return [];
+          if (conf.mode === 'pick' && Array.isArray(conf.picked) && conf.picked.length) {
+            const map = new Map(poolArr.map(p => [p.key, p]));
+            return conf.picked.map(k => map.get(k)).filter(Boolean);
+          }
+          const shuffled = [...poolArr].sort(() => 0.5 - Math.random());
+          return shuffled.slice(0, conf.count);
+        }
+
+        const sections = [
+          { id: 'mcqs', title: 'Section - A (Objective Type)', conf: config.mcqs, pool: pools.mcqs, marks: (config.mcqs?.marks || 0) },
+          { id: 'short', title: 'Section - B (Short Questions)', conf: config.short, pool: pools.short, marks: (config.short?.marks || 0) },
+          { id: 'long', title: 'Section - C (Long Questions)', conf: config.long, pool: pools.long, marks: (config.long?.marks || 0) }
+        ];
+
+        if (config.theorem && Array.isArray(pools.theorem) && pools.theorem.length && config.theorem.include) {
+          sections.push({ id: 'theorem', title: 'Section - D (Theorems)', conf: config.theorem, pool: pools.theorem, marks: (config.theorem?.marks || 0) });
+        }
+
+        sections.forEach(sec => {
+          if (!sec.conf?.include) return;
+          const chosen = pickItems(sec.pool, sec.conf);
+          if (!chosen.length) return;
+
+          totalExamMarks += chosen.length * (sec.marks || 0);
+          container.innerHTML += `<div class="section-heading">${sec.title}</div>`;
+
+          chosen.forEach((item, i) => {
+            // ---- MCQ Section ----
+            if (sec.id === 'mcqs') {
+              const q = item.full || {};
+              const mcqImg = fixPath(q.image_url);
+              const opts = Array.isArray(q.options) ? q.options : [];
+              const optsUr = Array.isArray(q.options_ur) ? q.options_ur : [];
+              // Only show if either Urdu or English question exists
+              if (
+                ((q.question && q.question.trim()) || (q.en && q.en.trim())) ||
+                ((q.question_ur && q.question_ur.trim()) || (q.ur && q.ur.trim()))
+              ) {
+                container.innerHTML += `
+                  <div class="question-row" data-qtype="mcq">
+                    <div class="q-number">Q.${i+1}</div>
+                    <div class="q-text-en">
+                      ${q.question || q.en || ''}
+                      ${mcqImg ? `<img src="${mcqImg}" class="my-2 max-h-48 mx-auto" alt="">` : ''}
+                      <div class="options-grid">
+                        ${opts.map((o,idx) => `<span>(${String.fromCharCode(97+idx)}) ${o}</span>`).join('')}
+                      </div>
+                    </div>
+                    <div class="q-marks">(${sec.marks})</div>
+                    <div class="q-text-ur urdu-text">
+                      ${q.question_ur || q.ur || ''}
+                      <div class="options-grid" dir="rtl">
+                        ${optsUr.map((o,idx) => `<span>(${String.fromCharCode(97+idx)}) ${o}</span>`).join('')}
+                      </div>
+                    </div>
+                  </div>`;
+              }
+            } else {
+              // ---- Non-MCQs: check that at least Urdu or English is present
+              const q = item.full || {};
+              if ((q.en && q.en.trim()) || (q.ur && q.ur.trim())) {
+                const tableMarkup = q.table ? generateTableHTML(q.table) : '';
+                const imageMarkup = q.img ? `<div class="w-full flex justify-center py-2"><img src="${q.img}" style="max-width: 400px; border: 1px solid #ddd; padding: 5px;" alt=""></div>` : '';
+                container.innerHTML += `
+                  <div class="flex flex-col mb-5 border-b border-gray-200 pb-3" data-qtype="${sec.id}">
+                    <div class="question-row mb-0">
+                      <div class="q-number">Q.${i+1}</div>
+                      <div class="q-text-en">${q.en || ''}</div>
+                      <div class="q-marks">(${sec.marks})</div>
+                      <div class="q-text-ur urdu-text">${q.ur || ''}</div>
+                    </div>
+                    ${tableMarkup}
+                    ${imageMarkup}
+                  </div>`;
+              }
+            }
+          });
+        });
+
+        document.getElementById('displayMarks').innerText = `MAXIMUM MARKS: ${totalExamMarks}`;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    generatePaper();
+
+    // Share with Web Share API, fallback to WhatsApp or SMS
+    async function sharePaper() {
+      const link = window.location.href;
+      const text = `Please review this Paperify exam paper:\n${link}`;
+
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'Paperify Exam Paper', text, url: link });
+          return;
+        }
+      } catch (_) {}
+      const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      const sms = `sms:?&body=${encodeURIComponent(text)}`;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = sms;
+        setTimeout(() => { window.open(wa, '_blank'); }, 600);
+      } else {
+        window.open(wa, '_blank');
+      }
+    }
+
+    // Prevent copying from the paper area
+    const paperRoot = document.getElementById('paperRoot');
+    // Disable right-click context menu
+    paperRoot.addEventListener('contextmenu', (e) => e.preventDefault());
+    // Block Ctrl/Cmd + C only inside the paper
+    document.addEventListener('keydown', (e) => {
+      const withinPaper = document.activeElement === document.body || paperRoot.contains(document.activeElement);
+      if (!withinPaper) return;
+      const isMac = navigator.platform.toUpperCase().includes('MAC');
+      const copyCombo = (isMac && e.metaKey && e.key.toLowerCase() === 'c') || (!isMac && e.ctrlKey && e.key.toLowerCase() === 'c');
+      if (copyCombo) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+  </script>
+</body>
+</html>

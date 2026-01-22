@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paperify - Education Reimagined</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-green: #19c880;
+            --deep-navy: #3f3a64;
+            --soft-bg: #f8f1eb;
+        }
+
+        body { font-family: 'Inter', sans-serif; color: var(--deep-navy); background-color: #fff; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+        /* Narrower Container for a more "Elite" feel */
+        .custom-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .handwritten {
+            font-family: 'Reenie Beanie', cursive;
+            color: var(--brand-green);
+            font-size: 2.2rem;
+        }
+
+        .hero-curve {
+            background-color: var(--soft-bg);
+            border-bottom-left-radius: 50% 30px;
+            border-bottom-right-radius: 50% 30px;
+            position: relative;
+        }
+
+        .main-portrait {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 12px solid white;
+            box-shadow: 0 40px 80px rgba(63, 58, 100, 0.12);
+            object-fit: cover;
+            z-index: 5;
+        }
+
+        .floating-card {
+            position: absolute;
+            bottom: 8%;
+            right: -5%;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+            width: 220px;
+            z-index: 10;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .btn-premium {
+            background-color: var(--brand-green);
+            transition: all 0.4s ease;
+        }
+        .btn-premium:hover {
+            background-color: var(--deep-navy);
+            transform: translateY(-3px);
+         
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-[#f8f1eb] py-4 md:py-6 sticky top-0 z-50">
+        <div class="custom-container flex justify-between items-center">
+            <div class="text-3xl font-black tracking-tighter text-[#3f3a64]">Paper<span class="text-[#19c880]">ify</span></div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden lg:flex items-center gap-12 text-[15px] font-bold text-[#3f3a64]">
+                <a href="/" class="text-[#19c880]">Home</a>
+                <a href="/courses" class="hover:text-[#19c880] transition">Courses</a>
+                <a href="/paper" class="hover:text-[#19c880] transition">Generate</a>
+                
+                <div class="flex items-center gap-6 ml-4 border-l pl-8 border-gray-300">
+                    <i class="fa-solid fa-cart-shopping text-gray-400 cursor-pointer hover:text-[#19c880]"></i>
+                    <i class="fa-regular fa-user-circle text-xl text-gray-400 cursor-pointer hover:text-[#19c880]"></i>
+                </div>
+            </div>
+
+            <!-- Mobile Nav Toggle -->
+            <button id="mobileNavBtn" class="lg:hidden w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#3f3a64]">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="lg:hidden hidden">
+            <div class="custom-container pt-3 pb-4">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3 font-bold text-[#3f3a64]">
+                    <a href="/" class="py-2 px-3 rounded-xl bg-[#f8f1eb] text-[#19c880]">Home</a>
+                    <a href="/courses" class="py-2 px-3 rounded-xl hover:bg-[#f8f1eb] transition">Courses</a>
+                    <a href="/paper" class="py-2 px-3 rounded-xl hover:bg-[#f8f1eb] transition">Generate</a>
+                    <div class="flex items-center gap-6 pt-2 border-t border-gray-200">
+                        <i class="fa-solid fa-cart-shopping text-gray-400 cursor-pointer hover:text-[#19c880]"></i>
+                        <i class="fa-regular fa-user-circle text-xl text-gray-400 cursor-pointer hover:text-[#19c880]"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-curve pt-16 pb-32">
+        <div class="custom-container flex flex-col lg:flex-row items-center gap-12">
+            
+            <div class="lg:w-1/2 text-center lg:text-left">
+                <h4 class="uppercase tracking-[0.4em] text-[11px] font-bold text-[#19c880] mb-6 italic">A lifebuoy for learning</h4>
+                <h1 class="text-5xl lg:text-6xl font-black leading-[1.1] mb-8 text-[#3f3a64]">
+                    The Best Way <br> To <span class="text-[#19c880] font-normal italic">Master</span> <br> Your Time.
+                </h1>
+                <p class="text-gray-500 text-base mb-10 max-w-md leading-relaxed">
+                    A piece of paper cannot decide our future. Focus on real skills that boost your career growth and personal freedom.
+                </p>
+                <button class="btn-premium text-white px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">
+                    Get Started Now
+                </button>
+            </div>
+
+            <div class="lg:w-1/2 flex justify-center relative">
+                <div class="relative">
+                    <div class="absolute -top-12 -left-10 hidden xl:block">
+                        <span class="handwritten">Join 20k+ Students</span>
+                    </div>
+
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800" class="main-portrait" alt="Student">
+                    
+                    <div class="floating-card hidden md:block">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-[#19c880]">
+                                <i class="fa fa-chart-line"></i>
+                            </div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">Growth Rate</p>
+                        </div>
+                        <p class="text-xl font-black text-[#3f3a64]">98.5% Success</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="text-center mt-24 mb-16">
+        <h2 class="text-3xl md:text-4xl text-[#3f3a64] font-bold">
+            Explore <span class="text-[#19c880] italic">Top Categories</span>
+        </h2>
+    </div>
+
+    <script>
+        const mobileNavBtn = document.getElementById('mobileNavBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileNavBtn && mobileMenu) {
+            mobileNavBtn.addEventListener('click', () => {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                mobileMenu.classList.toggle('hidden', !isHidden);
+                mobileNavBtn.innerHTML = isHidden ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+            });
+        }
+    </script>
+
+    <section class="custom-container pb-32">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="bg-gray-50 p-10 rounded-[35px] text-center hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-green-100">
+                <div class="text-3xl text-gray-300 mb-6"><i class="fa-solid fa-code"></i></div>
+                <h3 class="font-bold mb-2">Web Dev</h3>
+                <p class="text-gray-400 text-xs">Modern coding skills.</p>
+            </div>
+            <div class="bg-gray-50 p-10 rounded-[35px] text-center hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-green-100">
+                <div class="text-3xl text-gray-300 mb-6"><i class="fa-solid fa-brain"></i></div>
+                <h3 class="font-bold mb-2">Self Dev</h3>
+                <p class="text-gray-400 text-xs">Focus & Management.</p>
+            </div>
+            <div class="bg-gray-50 p-10 rounded-[35px] text-center hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-green-100">
+                <div class="text-3xl text-gray-300 mb-6"><i class="fa-solid fa-compass"></i></div>
+                <h3 class="font-bold mb-2">Mentoring</h3>
+                <p class="text-gray-400 text-xs">Professional guidance.</p>
+            </div>
+            <div class="bg-gray-50 p-10 rounded-[35px] text-center hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-green-100">
+                <div class="text-3xl text-gray-300 mb-6"><i class="fa-solid fa-laptop"></i></div>
+                <h3 class="font-bold mb-2">Remote Work</h3>
+                <p class="text-gray-400 text-xs">Work from anywhere.</p>
+            </div>
+        </div>
+    </section>
+<footer class="bg-[#3f3a64] py-12 text-center">
+        <div class="text-xl font-black text-white">Paper<span class="text-[#19c880]">ify</span></div>
+        <p class="text-gray-400 text-[10px] mt-2 uppercase tracking-widest">Reimagining Education</p>
+    </footer>
+</body>
+</html>

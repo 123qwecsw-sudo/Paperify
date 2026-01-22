@@ -1,0 +1,26 @@
+{
+  "name": "spotify",
+  "version": "1.0.0",
+  "description": "this is spotify clone",
+  "key": "module",
+  "keywords": [
+    "spotify",
+    "song"
+  ],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "stop": "nodemon ./syllabus-api/server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.1",
+    "mongoose-paginate-v2": "^1.9.1",
+    "nodemon": "^3.1.10",
+    "time-js": "^0.0.5"
+  }
+}

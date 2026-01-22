@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Question Settings | Paperify</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    :root {
+      --brand-green: #19c880;
+      --text-dark: #1f2937;
+      --border-light: #e5e7eb;
+      --bg-soft: #f9fafb;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: var(--text-dark);
+    }
+
+    h1, h3 { font-family: 'Playfair Display', serif; }
+
+    .custom-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .settings-wrapper {
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 40px;
+      background: #ffffff;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .setting-row {
+      padding: 24px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .setting-row:last-of-type { border-bottom: none; }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      background: var(--bg-soft);
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--brand-green);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(25, 200, 128, 0.1);
+    }
+
+    input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: var(--brand-green);
+      cursor: pointer;
+    }
+
+    .marks-summary {
+      background: var(--bg-soft);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-generate {
+      background: var(--brand-green);
+      color: white;
+      padding: 16px;
+      font-weight: 800;
+      border-radius: 12px;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-generate:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(25, 200, 128, 0.2);
+    }
+
+    .urdu-text { direction: rtl; font-family: 'Noto Nastaliq Urdu', serif; }
+
+    @media (max-width: 640px) {
+      .settings-wrapper { padding: 20px; }
+      .grid-cols-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="bg-[#f8f1eb]/80 backdrop-blur-md py-6 sticky top-0 z-50">
+    <div class="custom-container flex justify-between items-center">
+      <div class="text-3xl font-black tracking-tighter text-[#3f3a64]">
+        <a href="/">Paper<span class="text-[#19c880]">ify</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="custom-container py-12">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl md:text-5xl font-black mb-2">Configure Your <span class="text-[#19c880] italic">Paper</span></h1>
+      <p class="text-gray-400 font-medium">Customize your exam structure below</p>
+    </div>
+
+    <div class="settings-wrapper">
+      <div id="selectionSummary" style="display: none;" class="pb-6 border-b border-gray-100">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Selected Content</h3>
+        <div id="selectedChaptersDisplay" class="flex flex-wrap gap-2 text-sm"></div>
+      </div>
+
+      <div class="setting-row">
+        <h3 class="text-xl font-extrabold mb-4">Examination Time</h3>
+        <div class="relative">
+          <input type="text" id="paperDuration" value="1 Hours" placeholder="e.g. 3 Hours">
+        </div>
+      </div>
+
+      <!-- MCQ Section with Random/Pick -->
+      <div class="setting-row" id="mcqSection">
+        <label class="flex items-center justify-between mb-4 cursor-pointer group">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="includeMCQs" checked onchange="updateTotals()">
+            <span class="text-lg font-bold group-hover:text-[#19c880] transition-colors">Objective (MCQs)</span>
+          </div>
+          <div class="relative">
+            <button type="button" class="px-3 py-1 text-xs font-bold rounded-md border bg-white" id="mcqModeBtn" onclick="toggleModeMenu('mcq')">Random ▾</button>
+            <div class="hidden absolute right-0 mt-1 bg-white border rounded-md shadow z-10" id="mcqModeMenu">
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('mcq','random')">Random</button>
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('mcq','pick')">Pick…</button>
+            </div>
+          </div>
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">COUNT</label>
+            <input type="number" id="mcqCount" value="3" oninput="updateTotals()">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">MARKS</label>
+            <input type="number" id="mcqMarks" value="1" oninput="updateTotals()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Short Section with Random/Pick -->
+      <div class="setting-row" id="shortSection">
+        <label class="flex items-center justify-between mb-4 cursor-pointer group">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="includeShort" checked onchange="updateTotals()">
+            <span class="text-lg font-bold group-hover:text-[#19c880] transition-colors">Short Questions</span>
+          </div>
+          <div class="relative">
+            <button type="button" class="px-3 py-1 text-xs font-bold rounded-md border bg-white" id="shortModeBtn" onclick="toggleModeMenu('short')">Random ▾</button>
+            <div class="hidden absolute right-0 mt-1 bg-white border rounded-md shadow z-10" id="shortModeMenu">
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('short','random')">Random</button>
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('short','pick')">Pick…</button>
+            </div>
+          </div>
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">COUNT</label>
+            <input type="number" id="shortCount" value="2" oninput="updateTotals()">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">MARKS</label>
+            <input type="number" id="shortMarks" value="2" oninput="updateTotals()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Long Section with Random/Pick -->
+      <div class="setting-row" id="longSection">
+        <label class="flex items-center justify-between mb-4 cursor-pointer group">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="includeLong" checked onchange="updateTotals()">
+            <span class="text-lg font-bold group-hover:text-[#19c880] transition-colors">Long Questions</span>
+          </div>
+          <div class="relative">
+            <button type="button" class="px-3 py-1 text-xs font-bold rounded-md border bg-white" id="longModeBtn" onclick="toggleModeMenu('long')">Random ▾</button>
+            <div class="hidden absolute right-0 mt-1 bg-white border rounded-md shadow z-10" id="longModeMenu">
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('long','random')">Random</button>
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('long','pick')">Pick…</button>
+            </div>
+          </div>
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">COUNT</label>
+            <input type="number" id="longCount" value="2" oninput="updateTotals()">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">MARKS</label>
+            <input type="number" id="longMarks" value="4" oninput="updateTotals()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Theorem Section (hidden until detected) -->
+      <div class="setting-row hidden" id="theoremSection">
+        <label class="flex items-center justify-between mb-4 cursor-pointer group">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="includeTheorem" onchange="updateTotals()">
+            <span class="text-lg font-bold group-hover:text-[#19c880] transition-colors">Theorems</span>
+          </div>
+          <div class="relative">
+            <button type="button" class="px-3 py-1 text-xs font-bold rounded-md border bg-white" id="theoremModeBtn" onclick="toggleModeMenu('theorem')">Random ▾</button>
+            <div class="hidden absolute right-0 mt-1 bg-white border rounded-md shadow z-10" id="theoremModeMenu">
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('theorem','random')">Random</button>
+              <button class="block px-4 py-2 text-sm w-full text-left hover:bg-gray-50" onclick="setSectionMode('theorem','pick')">Pick…</button>
+            </div>
+          </div>
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">COUNT</label>
+            <input type="number" id="theoremCount" value="1" oninput="updateTotals()">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-400 block mb-1">MARKS</label>
+            <input type="number" id="theoremMarks" value="5" oninput="updateTotals()">
+          </div>
+        </div>
+      </div>
+
+      <div class="marks-summary">
+        <span class="font-bold text-gray-500">Total Score:</span>
+        <span class="text-2xl font-black text-gray-800"><span id="totalMarks">0</span> Marks</span>
+      </div>
+
+      <button onclick="generatePaper()" class="btn-generate w-full">
+        GENERATE FINAL PAPER <i class="fa-solid fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- Picker Modal -->
+  <div id="pickerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white w-[min(900px,95%)] rounded-2xl overflow-hidden">
+      <div class="px-4 py-3 bg-[#f8f1eb] flex items-center justify-between">
+        <div class="font-extrabold" id="pickerTitle">Pick Questions</div>
+        <button class="px-3 py-1 rounded-md border" onclick="closePicker()">Close</button>
+      </div>
+      <div class="p-4 space-y-4 max-h-[70vh] overflow-auto">
+        <div id="pickerList" class="space-y-2"></div>
+      </div>
+      <div class="px-4 py-3 border-t flex items-center justify-end gap-2">
+        <button class="px-4 py-2 rounded-md border" onclick="clearPickerSelection()">Clear</button>
+        <button class="px-4 py-2 rounded-md bg-[#19c880] text-white font-bold" onclick="applyPicker()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const board = urlParams.get('board');
+    const className = urlParams.get('class');
+    const group = urlParams.get('group');
+    const selectionsParam = urlParams.get('selections');
+
+    if (selectionsParam) {
+      try {
+        const selections = JSON.parse(decodeURIComponent(selectionsParam));
+        const summarySection = document.getElementById('selectionSummary');
+        const displayDiv = document.getElementById('selectedChaptersDisplay');
+        if (selections && selections.length > 0) {
+          summarySection.style.display = 'block';
+          displayDiv.innerHTML = selections.map(sel => `
+            <span class="bg-[#f8f1eb] text-[#3f3a64] px-3 py-1 rounded-md font-semibold border border-[#e5dcd3]">
+              ${sel.subject} (${sel.chapters.length})
+            </span>
+          `).join('');
+        }
+      } catch (e) { console.error('Error parsing selections:', e); }
+    }
+
+    const sectionState = {
+      mcq: { mode: 'random', picked: [] },
+      short: { mode: 'random', picked: [] },
+      long: { mode: 'random', picked: [] },
+      theorem: { mode: 'random', picked: [] }
+    };
+
+    const pools = { mcq: [], short: [], long: [], theorem: [] };
+    let activePickType = null;
+
+    function toggleModeMenu(type) {
+      const menu = document.getElementById(type + 'ModeMenu');
+      ['mcq','short','long','theorem'].forEach(t => {
+        const m = document.getElementById(t+'ModeMenu');
+        if (m && m !== menu) m.classList.add('hidden');
+      });
+      if (menu) menu.classList.toggle('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      const ids = ['mcq','short','long','theorem'];
+      const inBtn = ids.some(t => e.target.id === t+'ModeBtn');
+      const inMenu = ids.some(t => e.target.closest?.('#'+t+'ModeMenu'));
+      if (!inBtn && !inMenu) {
+        ids.forEach(t => {
+          const menu = document.getElementById(t+'ModeMenu');
+          if (menu) menu.classList.add('hidden');
+        });
+      }
+    });
+
+    function setSectionMode(type, mode) {
+      sectionState[type].mode = mode;
+      const btn = document.getElementById(type + 'ModeBtn');
+      if (btn) btn.textContent = (mode === 'pick' ? 'Pick ▾' : 'Random ▾');
+      document.getElementById(type + 'ModeMenu').classList.add('hidden');
+      if (mode === 'pick') openPicker(type);
+      else updateTotals();
+    }
+
+    function openPicker(type) {
+      activePickType = type;
+      const titleMap = { mcq: 'Pick MCQs', short: 'Pick Short Questions', long: 'Pick Long Questions', theorem: 'Pick Theorems' };
+      document.getElementById('pickerTitle').textContent = titleMap[type] || 'Pick Questions';
+      renderPickerList(type);
+      const modal = document.getElementById('pickerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    function closePicker() {
+      const modal = document.getElementById('pickerModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      activePickType = null;
+    }
+
+    function clearPickerSelection() {
+      if (!activePickType) return;
+      sectionState[activePickType].picked = [];
+      renderPickerList(activePickType);
+      updateTotals();
+    }
+    function applyPicker() { closePicker(); updateTotals(); }
+
+    function renderPickerList(type) {
+      const list = document.getElementById('pickerList');
+      const items = pools[type] || [];
+      if (!items.length) {
+        list.innerHTML = `<div class="text-sm text-gray-500">No items available to pick.</div>`;
+        return;
+      }
+      const pickedSet = new Set(sectionState[type].picked);
+      list.innerHTML = items.map((it) => {
+        const checked = pickedSet.has(it.key) ? 'checked' : '';
+        const meta = `${it.subject} • ${it.chapter}`;
+        return `
+          <label class="flex items-start gap-3 border rounded-lg p-3 hover:bg-gray-50">
+            <input type="checkbox" class="mt-[3px]" data-pick-key="${it.key}" ${checked}
+                   onchange="onPickerToggle('${type}', '${it.key}', this.checked)">
+            <div class="flex-1">
+              <div class="font-semibold">${it.displayEN}</div>
+              ${it.displayUR ? `<div class="text-sm text-gray-600 urdu-text">${it.displayUR}</div>` : ''}
+              <div class="text-xs text-gray-500 mt-1">${meta}</div>
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function onPickerToggle(type, key, isChecked) {
+      const arr = sectionState[type].picked;
+      const idx = arr.indexOf(key);
+      if (isChecked && idx === -1) arr.push(key);
+      if (!isChecked && idx !== -1) arr.splice(idx, 1);
+      updateTotals();
+    }
+
+    function updateTotals() {
+      const mcqIncluded = document.getElementById('includeMCQs').checked;
+      const shortIncluded = document.getElementById('includeShort').checked;
+      const longIncluded = document.getElementById('includeLong').checked;
+      const theoremIncluded = document.getElementById('includeTheorem')?.checked || false;
+
+      const mcqCount = sectionState.mcq.mode === 'pick' ? sectionState.mcq.picked.length : (parseInt(document.getElementById('mcqCount').value) || 0);
+      const shortCount = sectionState.short.mode === 'pick' ? sectionState.short.picked.length : (parseInt(document.getElementById('shortCount').value) || 0);
+      const longCount = sectionState.long.mode === 'pick' ? sectionState.long.picked.length : (parseInt(document.getElementById('longCount').value) || 0);
+      const theoremCount = sectionState.theorem.mode === 'pick' ? sectionState.theorem.picked.length : (parseInt(document.getElementById('theoremCount')?.value) || 0);
+
+      const mcqMarks = parseFloat(document.getElementById('mcqMarks').value) || 0;
+      const shortMarks = parseFloat(document.getElementById('shortMarks').value) || 0;
+      const longMarks = parseFloat(document.getElementById('longMarks').value) || 0;
+      const theoremMarks = parseFloat(document.getElementById('theoremMarks')?.value) || 0;
+
+      const m = mcqIncluded ? mcqCount * mcqMarks : 0;
+      const s = shortIncluded ? shortCount * shortMarks : 0;
+      const l = longIncluded ? longCount * longMarks : 0;
+      const t = theoremIncluded ? theoremCount * theoremMarks : 0;
+
+      document.getElementById('totalMarks').textContent = m + s + l + t;
+    }
+
+    async function buildPoolsAndDetectTheorems() {
+      try {
+        const selections = JSON.parse(decodeURIComponent(selectionsParam || '[]') || '[]');
+        if (!selections.length) return;
+
+        const res = await fetch(`/api/data/${board}`);
+        const syllabus = await res.json();
+        const cls = syllabus.find(c => c.class?.toString() === String(className));
+        if (!cls) return;
+
+        const has = { theorem: false };
+        pools.mcq = []; pools.short = []; pools.long = []; pools.theorem = [];
+
+        selections.forEach(sel => {
+          const subj = cls.subjects?.find(s => s.name?.en?.toLowerCase() === sel.subject.toLowerCase());
+          if (!subj) return;
+
+          sel.chapters.forEach(chapTitle => {
+            // chapters might have property "chapter" with {en, ur}
+            const ch = subj.chapters?.find(c =>
+              (c.title?.en === chapTitle || c.chapter?.en === chapTitle || c.chapter === chapTitle)
+            );
+            if (!ch) return;
+
+            const chapterEN = ch.chapter?.en || ch.title?.en || chapTitle;
+            const chapterUR = ch.chapter?.ur || ch.title?.ur || '';
+
+            // MCQs
+            if (Array.isArray(ch.mcqs)) {
+              ch.mcqs.forEach((q, i) => {
+                const key = `mcq|${sel.subject}|${chapterEN}|${i}`;
+                pools.mcq.push({
+                  key,
+                  displayEN: q.question || q.en || `MCQ #${i+1}`,
+                  displayUR: q.question_ur || q.ur || '',
+                  type: 'mcq',
+                  subject: sel.subject,
+                  chapter: chapterEN
+                });
+              });
+            }
+            // Short (string arrays or objects)
+            if (Array.isArray(ch.short_questions)) {
+              const urArr = Array.isArray(ch.short_questions_ur) ? ch.short_questions_ur : [];
+              ch.short_questions.forEach((q, i) => {
+                const en = typeof q === 'string' ? q : (q.question || q.en || '');
+                const ur = urArr[i] || (typeof q === 'object' ? (q.question_ur || q.ur || '') : '');
+                const key = `short|${sel.subject}|${chapterEN}|${i}`;
+                pools.short.push({
+                  key,
+                  displayEN: en,
+                  displayUR: ur,
+                  type: 'short',
+                  subject: sel.subject,
+                  chapter: chapterEN
+                });
+              });
+            }
+            // Long (string arrays or objects)
+            if (Array.isArray(ch.long_questions)) {
+              const urArr = Array.isArray(ch.long_questions_ur) ? ch.long_questions_ur : [];
+              ch.long_questions.forEach((q, i) => {
+                const en = typeof q === 'string' ? q : (q.question || q.en || '');
+                const ur = urArr[i] || (typeof q === 'object' ? (q.question_ur || q.ur || '') : '');
+                const key = `long|${sel.subject}|${chapterEN}|${i}`;
+                pools.long.push({
+                  key,
+                  displayEN: en,
+                  displayUR: ur,
+                  type: 'long',
+                  subject: sel.subject,
+                  chapter: chapterEN
+                });
+              });
+            }
+            // Theorems: arrays theorem and theorem_ur
+            if (Array.isArray(ch.theorem) && ch.theorem.length) {
+              has.theorem = true;
+              const urArr = Array.isArray(ch.theorem_ur) ? ch.theorem_ur : [];
+              ch.theorem.forEach((t, i) => {
+                const key = `theorem|${sel.subject}|${chapterEN}|${i}`;
+                pools.theorem.push({
+                  key,
+                  displayEN: t,
+                  displayUR: urArr[i] || '',
+                  type: 'theorem',
+                  subject: sel.subject,
+                  chapter: chapterEN
+                });
+              });
+            }
+          });
+        });
+
+        const thSec = document.getElementById('theoremSection');
+        if (thSec) thSec.classList.toggle('hidden', !has.theorem);
+
+        updateTotals();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function generatePaper() {
+      const config = {
+        duration: document.getElementById('paperDuration').value,
+        mcqs: {
+          include: document.getElementById('includeMCQs').checked,
+          mode: sectionState.mcq.mode,
+          count: parseInt(document.getElementById('mcqCount').value) || 0,
+          marks: parseFloat(document.getElementById('mcqMarks').value) || 0,
+          picked: sectionState.mcq.picked
+        },
+        short: {
+          include: document.getElementById('includeShort').checked,
+          mode: sectionState.short.mode,
+          count: parseInt(document.getElementById('shortCount').value) || 0,
+          marks: parseFloat(document.getElementById('shortMarks').value) || 0,
+          picked: sectionState.short.picked
+        },
+        long: {
+          include: document.getElementById('includeLong').checked,
+          mode: sectionState.long.mode,
+          count: parseInt(document.getElementById('longCount').value) || 0,
+          marks: parseFloat(document.getElementById('longMarks').value) || 0,
+          picked: sectionState.long.picked
+        }
+      };
+
+      if (!document.getElementById('theoremSection').classList.contains('hidden')) {
+        config.theorem = {
+          include: document.getElementById('includeTheorem').checked,
+          mode: sectionState.theorem.mode,
+          count: parseInt(document.getElementById('theoremCount').value) || 0,
+          marks: parseFloat(document.getElementById('theoremMarks').value) || 0,
+          picked: sectionState.theorem.picked
+        };
+      }
+
+      const params = new URLSearchParams({
+        board, class: className, group, selections: selectionsParam || '',
+        config: JSON.stringify(config)
+      });
+      window.location.href = `/pape?${params.toString()}`;
+    }
+
+    // Init
+    buildPoolsAndDetectTheorems();
+    updateTotals();
+  </script>
+</body>
+</html>

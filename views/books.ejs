@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Subject | Paperify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root { 
+            --brand-green: #3d8467; 
+            --deep-navy: #3f3a64; 
+            --soft-bg: #f8f1eb; 
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #ffffff; 
+            color: var(--deep-navy); 
+        }
+        
+        h1, h2, h3 { 
+            font-family: 'Playfair Display', serif; 
+        }
+        
+        .custom-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 24px; 
+        }
+        
+        .subject-card { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid #eee; 
+            background: white; 
+            cursor: pointer;
+        }
+        
+        .subject-card:hover { 
+            border-color: var(--brand-green); 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 40px rgba(63, 58, 100, 0.08); 
+        }
+
+        /* Modal/Popup Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .close-btn {
+            background-color:white;
+            border: none;
+            width: 40px;
+
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #5f6164;
+            transform: rotate(90deg);
+        }
+
+        .chapter-item {
+            padding: 16px;
+            border: 2px solid #f3f4f6;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .chapter-item:hover {
+            border-color: var(--brand-green);
+            background: #f0fff9;
+        }
+
+        .chapter-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--brand-green);
+            cursor: pointer;
+        }
+
+        .chapter-item label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--deep-navy);
+        }
+
+        .btn-select-all, .btn-deselect-all {
+            flex: 1;
+            padding: 12px 24px;
+            border: 2px solid var(--brand-green);
+            background: white;
+            color: var(--brand-green);
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-select-all:hover, .btn-deselect-all:hover {
+            background: var(--brand-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-done {
+            flex: 1;
+            padding: 12px 24px;
+            background: var(--brand-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(25, 200, 128, 0.3);
+        }
+
+        .btn-done:hover {
+            background: #16b370;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 200, 128, 0.4);
+        }
+
+        .btn-done:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .selected-badge {
+            display: inline-block;
+            background: var(--brand-green);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .modal-content {
+                max-width: 95%;
+                border-radius: 20px;
+            }
+
+            .modal-header, .modal-body, .modal-footer {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .btn-select-all, .btn-deselect-all, .btn-done {
+                width: 100%;
+            }
+
+            .custom-container {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-[#f8f1eb] py-4 md:py-6 sticky top-0 z-50">
+        <div class="custom-container flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0">
+            <div class="text-3xl font-black tracking-tighter text-[#3f3a64]">
+                <a href="/">Paper<span class="text-[#19c880]">ify</span></a>
+            </div>
+            <div class="px-4 py-1 bg-white rounded-full border border-gray-200 shadow-sm text-center md:text-right w-full md:w-auto">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Selection</p>
+                <p id="displayInfo" class="text-sm font-bold text-[#19c880] capitalize">Loading...</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="custom-container py-16">
+        <div class="mb-12 text-center md:text-left">
+            <h1 class="text-4xl md:text-5xl font-black mb-4">Choose Your <span class="text-[#19c880] italic">Textbook</span></h1>
+            <p class="text-gray-400 font-medium">Select a subject to choose chapters for your custom paper.</p>
+        </div>
+
+        <div id="subjectGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="col-span-full text-center py-20">
+                <i class="fas fa-spinner fa-spin text-4xl text-[#19c880] mb-4"></i>
+                <p class="text-gray-400">Loading subjects based on your selection...</p>
+            </div>
+        </div>
+
+        <!-- Proceed button renders here (NOT in navbar) -->
+        <div id="proceedArea" class="mt-12 text-center"></div>
+
+        <div class="mt-20 text-center">
+            <button onclick="window.history.back()" class="text-gray-400 hover:text-[#3f3a64] font-bold text-sm uppercase tracking-widest transition">
+                <i class="fa fa-arrow-left mr-2"></i> Go Back to Groups
+            </button>
+        </div>
+    </main>
+
+    <!-- Chapter Selection Modal -->
+    <div id="chapterModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-black" id="modalTitle">Select Chapters</h2>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="chapterList" class="space-y-3">
+                    <!-- Chapters will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-select-all" onclick="selectAllChapters()">
+                    <i class="fas fa-check-double mr-2"></i> Select All
+                </button>
+                <button class="btn-deselect-all" onclick="deselectAllChapters()">
+                    <i class="fas fa-times-circle mr-2"></i> Deselect All
+                </button>
+                <button class="btn-done" id="doneBtn" onclick="confirmSelection()">
+                    <i class="fas fa-check mr-2"></i> Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const urlParams = new URLSearchParams(window.location.search);
+        const board = urlParams.get('board');
+        const className = urlParams.get('class') || '9';
+        const group = urlParams.get('group'); // optional for 11/12 (handled below)
+        
+        let currentSubject = null;
+        let selectedChapters = {}; // Store selected chapters for each subject: {subjectName: [chapterTitles]}
+        let allSubjects = [];
+
+        // Display selection info in navbar
+        if (board && className) {
+            document.getElementById('displayInfo').innerText = group
+                ? `${board} Board - Class ${className} (${group})`
+                : `${board} Board - Class ${className}`;
+        }
+
+        // Load subjects on page load
+        async function loadSubjects() {
+            const grid = document.getElementById('subjectGrid');
+
+            if (!board || !className) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-50 rounded-2xl border border-red-100">
+                        <p class="text-red-500 font-bold">Missing Selection Parameters!</p>
+                        <p class="text-gray-500 text-sm">Please go back and select Board and Class correctly.</p>
+                    </div>`;
+                return;
+            }
+
+            try {
+                const response = group
+                    ? await fetch(`/api/subjects/${board}/${className}/${group}`)
+                    : await fetch(`/api/subjects/${board}/${className}`);
+                allSubjects = await response.json();
+
+                if (allSubjects.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-20">
+                            <i class="fas fa-book-open text-gray-200 text-6xl mb-4"></i>
+                            <p class="text-gray-400 text-lg">No books found for this selection.</p>
+                        </div>`;
+                    return;
+                }
+
+                grid.innerHTML = '';
+
+                // Create a card for each subject
+                allSubjects.forEach(subject => {
+                    const subjectName = subject.name.en;
+                    const selectedCount = selectedChapters[subjectName] ? selectedChapters[subjectName].length : 0;
+                    
+                    grid.innerHTML += `
+                        <div class="subject-card p-10 rounded-[32px]" onclick="openChapterModal('${subjectName.replace(/'/g, "\\'")}')">
+                            <div class="w-14 h-14 bg-[#f8f1eb] rounded-2xl flex items-center justify-center text-[#19c880] text-2xl mb-8">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3 class="text-2xl font-black mb-2">${subjectName}</h3>
+                            <p class="text-sm text-gray-400 font-medium mb-8">Official Syllabus Based Textbook</p>
+                            ${selectedCount > 0 ? `<span class="selected-badge">${selectedCount} Selected</span>` : ''}
+                            <div class="mt-6 inline-flex items-center text-sm font-black text-[#19c880]">
+                                SELECT CHAPTERS <i class="fas fa-arrow-right ml-2"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Show proceed button if selections exist
+                addProceedButton();
+
+            } catch (error) {
+                console.error("Error fetching subjects:", error);
+                grid.innerHTML = `<p class="col-span-full text-center text-red-500">Error connecting to the server. Please try again.</p>`;
+            }
+        }
+
+        // Open chapter selection modal
+        async function openChapterModal(subjectName) {
+            currentSubject = subjectName;
+            const modal = document.getElementById('chapterModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const chapterList = document.getElementById('chapterList');
+
+            modalTitle.textContent = `Select Chapters - ${subjectName}`;
+            chapterList.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-2xl text-[#19c880]"></i></div>';
+
+            modal.classList.add('show');
+
+            try {
+                const response = await fetch(`/api/chapters/${board}/${className}/${encodeURIComponent(subjectName)}`);
+                const chapters = await response.json();
+
+                if (chapters.length === 0) {
+                    chapterList.innerHTML = '<p class="text-center text-gray-400 py-10">No chapters found for this subject.</p>';
+                    return;
+                }
+
+                chapterList.innerHTML = '';
+                const previouslySelected = selectedChapters[subjectName] || [];
+
+                chapters.forEach((chapter, index) => {
+                    const isChecked = previouslySelected.includes(chapter.title);
+                    chapterList.innerHTML += `
+                        <div class="chapter-item">
+                            <input type="checkbox" id="chapter-${index}" value="${chapter.title.replace(/"/g, '&quot;')}" ${isChecked ? 'checked' : ''} onchange="updateChapterSelection()">
+                            <label for="chapter-${index}">${chapter.title}</label>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error fetching chapters:", error);
+                chapterList.innerHTML = '<p class="text-center text-red-500 py-10">Error loading chapters. Please try again.</p>';
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('chapterModal');
+            modal.classList.remove('show');
+            currentSubject = null;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('chapterModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Select all chapters
+        function selectAllChapters() {
+            const checkboxes = document.querySelectorAll('#chapterList input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            updateChapterSelection();
+        }
+
+        // Deselect all chapters
+        function deselectAllChapters() {
+            const checkboxes = document.querySelectorAll('#chapterList input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateChapterSelection();
+        }
+
+        // Update chapter selection state
+        function updateChapterSelection() {
+            const checkboxes = document.querySelectorAll('#chapterList input[type="checkbox"]');
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+            
+            if (currentSubject) {
+                selectedChapters[currentSubject] = selected;
+            }
+
+            // Update done button state
+            const doneBtn = document.getElementById('doneBtn');
+            doneBtn.disabled = selected.length === 0;
+        }
+
+        // Confirm selection and proceed
+        function confirmSelection() {
+            if (!currentSubject) return;
+
+            const checkboxes = document.querySelectorAll('#chapterList input[type="checkbox"]');
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (selected.length === 0) {
+                alert('Please select at least one chapter.');
+                return;
+            }
+
+            selectedChapters[currentSubject] = selected;
+            closeModal();
+            
+            // Reload subjects to show updated selection count
+            loadSubjects();
+            
+            // Show proceed button if selections exist
+            setTimeout(() => {
+                addProceedButton();
+            }, 100);
+        }
+
+        // Proceed to questions page with selections
+        function proceedToQuestions() {
+            // Build selections array for the questions page
+            const selections = Object.keys(selectedChapters)
+                .filter(subj => selectedChapters[subj] && selectedChapters[subj].length > 0)
+                .map(subj => ({
+                    subject: subj,
+                    chapters: selectedChapters[subj]
+                }));
+
+            if (selections.length === 0) {
+                alert('Please select at least one chapter from any subject.');
+                return;
+            }
+
+            // Encode selections as JSON
+            const selectionsJson = encodeURIComponent(JSON.stringify(selections));
+            
+            // Navigate to questions page
+            window.location.href = `/questions?board=${board}&class=${className}&group=${group}&selections=${selectionsJson}`;
+        }
+
+        // Add a button to proceed to questions page
+        function addProceedButton() {
+            const hasSelections = Object.keys(selectedChapters).some(subj => 
+                selectedChapters[subj] && selectedChapters[subj].length > 0
+            );
+
+            const existingBtn = document.getElementById('proceedBtn');
+            const container = document.getElementById('proceedArea');
+            
+            if (hasSelections) {
+                if (!existingBtn) {
+                    const proceedBtn = document.createElement('div');
+                    proceedBtn.id = 'proceedBtn';
+                    proceedBtn.className = 'text-center';
+                    proceedBtn.innerHTML = `
+                        <button onclick="proceedToQuestions()" class="bg-[#19c880] text-white px-8 md:px-12 py-4 rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-[#16b370] transition-all transform hover:scale-105 w-full md:w-auto">
+                            <i class="fas fa-arrow-right mr-2"></i> Proceed to Configure Paper
+                        </button>
+                    `;
+                    container.appendChild(proceedBtn);
+                }
+            } else {
+                if (existingBtn) {
+                    existingBtn.remove();
+                }
+            }
+        }
+
+        // Initialize on page load
+        loadSubjects();
+
+        // Update done button state on checkbox change
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox' && e.target.closest('#chapterList')) {
+                updateChapterSelection();
+            }
+        });
+    </script>
+</body>
+</html>
